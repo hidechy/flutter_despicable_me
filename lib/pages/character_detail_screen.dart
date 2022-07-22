@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 
-import '../models/character.dart';
+import 'package:after_layout/after_layout.dart';
 
+import '../models/character.dart';
 import '../styleguide.dart';
 
-class CharacterDetailScreen extends StatelessWidget {
+class CharacterDetailScreen extends StatefulWidget {
   final Character character;
 
   const CharacterDetailScreen({Key key, this.character}) : super(key: key);
 
   @override
+  _CharacterDetailScreenState createState() => _CharacterDetailScreenState();
+}
+
+class _CharacterDetailScreenState extends State<CharacterDetailScreen>
+    with AfterLayoutMixin<CharacterDetailScreen> {
+  double _bottomSheetBottomPosition = -330;
+
+  bool isCollapsed = false;
+
+  Size size;
+
+  ///
+  @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    size = MediaQuery.of(context).size;
+
+    final screenHeight = size.height;
 
     return Scaffold(
       body: Stack(
@@ -20,11 +36,11 @@ class CharacterDetailScreen extends StatelessWidget {
           ///
 
           Hero(
-            tag: "background-${character.name}",
+            tag: "background-${widget.character.name}",
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: character.colors,
+                  colors: widget.character.colors,
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                 ),
@@ -38,12 +54,7 @@ class CharacterDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ///
-
                 SizedBox(height: 40),
-
-                ///
-
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, left: 16),
                   child: IconButton(
@@ -51,61 +62,119 @@ class CharacterDetailScreen extends StatelessWidget {
                     icon: Icon(Icons.close),
                     color: Colors.white.withOpacity(0.9),
                     onPressed: () {
+                      setState(() {
+                        _bottomSheetBottomPosition = -330;
+                      });
+
                       Navigator.pop(context);
                     },
                   ),
                 ),
-
-                ///
-
                 Align(
                   alignment: Alignment.topRight,
                   child: Hero(
-                    tag: "image-{$character.name}",
-                    child: Image.asset(
-                      character.imagePath,
-                      height: screenHeight * 0.45,
-                    ),
-                  ),
+                      tag: "image-${widget.character.name}",
+                      child: Image.asset(widget.character.imagePath,
+                          height: screenHeight * 0.45)),
                 ),
-
-                ///
-
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
                   child: Hero(
-                    tag: "name-${character.name}",
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        child: Text(
-                          character.name,
-                          style: AppTheme.heading,
-                        ),
-                      ),
-                    ),
-                  ),
+                      tag: "name-${widget.character.name}",
+                      child: Material(
+                          color: Colors.transparent,
+                          child: Container(
+                              child: Text(widget.character.name,
+                                  style: AppTheme.heading)))),
                 ),
-
-                ///
-
                 Padding(
                   padding: const EdgeInsets.fromLTRB(32, 0, 8, 32),
-                  child: Text(
-                    character.description,
-                    style: AppTheme.subHeading,
-                  ),
+                  child: Text(widget.character.description,
+                      style: AppTheme.subHeading),
                 ),
-
-                ///
               ],
             ),
           ),
 
           ///
+
+          //-----s
+
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.decelerate,
+            bottom: _bottomSheetBottomPosition,
+            left: 0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.yellowAccent.withOpacity(0.3),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ///
+
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _bottomSheetBottomPosition = isCollapsed ? 0 : -250;
+
+                        isCollapsed = !isCollapsed;
+                      });
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      height: 80,
+                      child: Text(
+                        "Clips",
+                        style: AppTheme.subHeading.copyWith(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  ///
+
+                  Container(
+                    height: 250,
+                    width: size.width,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withOpacity(0.3),
+                    ),
+                    child: Text('xxx'),
+                  ),
+
+                  ///
+                ],
+              ),
+            ),
+          ),
+
+          //-----e
+
+          ///
         ],
       ),
+    );
+  }
+
+  ///
+  @override
+  void afterFirstLayout(BuildContext context) {
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () {
+        setState(
+          () {
+            isCollapsed = true;
+            _bottomSheetBottomPosition = -250;
+          },
+        );
+      },
     );
   }
 }
