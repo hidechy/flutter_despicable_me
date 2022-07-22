@@ -16,11 +16,24 @@ class CharacterDetailScreen extends StatefulWidget {
 
 class _CharacterDetailScreenState extends State<CharacterDetailScreen>
     with AfterLayoutMixin<CharacterDetailScreen> {
-  double _bottomSheetBottomPosition = -330;
+  double bottomSheetButtonHeight;
+  double bottomSheetBodyHeight;
+  double bottomSheetBottomPosition;
 
   bool isCollapsed = false;
 
   Size size;
+
+  ///
+  @override
+  void initState() {
+    super.initState();
+    bottomSheetButtonHeight = 80.0;
+    bottomSheetBodyHeight = 500.0;
+
+    bottomSheetBottomPosition =
+        (bottomSheetButtonHeight + bottomSheetBodyHeight) * -1.0;
+  }
 
   ///
   @override
@@ -62,10 +75,6 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
                     icon: Icon(Icons.close),
                     color: Colors.white.withOpacity(0.9),
                     onPressed: () {
-                      setState(() {
-                        _bottomSheetBottomPosition = -330;
-                      });
-
                       Navigator.pop(context);
                     },
                   ),
@@ -104,7 +113,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
           AnimatedPositioned(
             duration: const Duration(milliseconds: 500),
             curve: Curves.decelerate,
-            bottom: _bottomSheetBottomPosition,
+            bottom: bottomSheetBottomPosition,
             left: 0,
             right: 0,
             child: Container(
@@ -119,7 +128,8 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
                   InkWell(
                     onTap: () {
                       setState(() {
-                        _bottomSheetBottomPosition = isCollapsed ? 0 : -250;
+                        bottomSheetBottomPosition =
+                            isCollapsed ? 0 : (bottomSheetBodyHeight * -1.0);
 
                         isCollapsed = !isCollapsed;
                       });
@@ -127,7 +137,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
                     child: Container(
                       alignment: Alignment.centerLeft,
                       padding: const EdgeInsets.symmetric(horizontal: 32),
-                      height: 80,
+                      height: bottomSheetButtonHeight,
                       child: Text(
                         "Clips",
                         style: AppTheme.subHeading.copyWith(
@@ -140,7 +150,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
                   ///
 
                   Container(
-                    height: 250,
+                    height: bottomSheetBodyHeight,
                     width: size.width,
                     decoration: BoxDecoration(
                       color: Colors.redAccent.withOpacity(0.3),
@@ -171,7 +181,7 @@ class _CharacterDetailScreenState extends State<CharacterDetailScreen>
         setState(
           () {
             isCollapsed = true;
-            _bottomSheetBottomPosition = -250;
+            bottomSheetBottomPosition = (bottomSheetBodyHeight * -1.0);
           },
         );
       },
