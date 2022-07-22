@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
 
+import '../models/character.dart';
 import '../styleguide.dart';
 
 import '../widgets/character_widget.dart';
 
-class CharacterListingScreen extends StatelessWidget {
+class CharacterListingScreen extends StatefulWidget {
+  @override
+  State<CharacterListingScreen> createState() => _CharacterListingScreenState();
+}
+
+class _CharacterListingScreenState extends State<CharacterListingScreen> {
+  PageController _pageController;
+  int currentPage = 0;
+
+  ///
+  @override
+  void initState() {
+    super.initState();
+
+    _pageController = PageController(
+      viewportFraction: 1.0,
+      initialPage: currentPage,
+      keepPage: false,
+    );
+  }
+
   ///
   @override
   Widget build(BuildContext context) {
@@ -38,7 +59,17 @@ class CharacterListingScreen extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: CharacterWidget(),
+                child: PageView(
+                  controller: _pageController,
+                  children: [
+                    for (var i = 0; i < characters.length; i++)
+                      CharacterWidget(
+                        character: characters[i],
+                        pageController: _pageController,
+                        currentPage: i,
+                      ),
+                  ],
+                ),
               ),
             ],
           ),
